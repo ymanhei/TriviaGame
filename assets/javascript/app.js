@@ -1,39 +1,58 @@
 var queryURL = "https://opentdb.com/api.php?amount=10&category=9&difficulty=medium&type=multiple";
 var qaobject;
-var current_question = 0;
+var current_question = 1;
 var intervalId;
 var correctnum = 0;
 var wrongnum = 0;
+var isclicked = false;
+var timesup = false;
+var totaltime = 3;
+var interval = 1000;
 
-        $.ajax({
-      url: queryURL,
-      method: "GET"
-    }).then(function(response) {
-        qaobject = response;
-        console.log(qaobject);
-    populateqa (current_question,response);
-    starttimer ();
-    });
+function initquestions () {
+
+    current_question = 1;
+correctnum = 0;
+wrongnum = 0;
+
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+      }).then(function(response) {
+          qaobject = response;
+          //console.log(qaobject);
+      populateqa ();
+      starttimer ();
+      });
+
+}
+        
 
 
-function populateqa (index,response) {
-    if (current_question < 10) {
+function populateqa () {
+    if (current_question < 11) {
         $(".choices").empty();
+        $(".results").empty();
         $(".questions").empty();
-        $(".questions").html(response.results[index].question);
+        console.log("current_question " + current_question);
+       // console.log(qaobject.results);
+        $(".questions").html("Question " + current_question + ". " + qaobject.results[current_question-1].question);
+        isclicked = false;
+        
 
-        var allanswers = response.results[index].incorrect_answers;
-        allanswers.push(response.results[index].correct_answer);
+        var allanswers = qaobject.results[current_question-1].incorrect_answers;
+        allanswers.push(qaobject.results[current_question-1].correct_answer);
         shuffle(allanswers);
         for (i=0; i< allanswers.length; i++ ){
             $(".choices").append('<br><input class="btn btn-primary" type="button" value="' + allanswers[i] + '">');
         }
-        
+        resettimer();
     } 
     else {
         $(".choices").empty();
         $(".questions").empty();
-        $(".questions").html("You have answered " + correctnum +" questions correctly!");
+        $(".results").empty();
+        $(".questions").html("You have " + correctnum +" correct answer and " + wrongnum + " incorrect answer.");
         $(".choices").html('<input class="btn-success" type="button" id="again" value="Try Again?">');
         stop();
     }
@@ -60,47 +79,40 @@ function shuffle(array) {
   }
 
   $(document).on("click", ".btn", function(event) {
-    event.preventDefault();
-    var youranswer = this.value;
+    //event.preventDefault();
+    if (isclicked == false) {
+        var youranswer = this.value;
+        isclicked = true;
+        stop();
+        if (youranswer == qaobject.results[current_question-1].correct_answer) {
+            //alert("CORRECT");
+            correctnum++;
+            current_question++;
+            //console.log(current_question);
+            $(".results").html("<h2>Congratulations! Your answer is correct! </h2>");
+            loadnextquestion ();   
+        }
+        else {
+            //alert("WRONG");
+            wrongnum++
+            current_question++;
+            //console.log(current_question);
+            $(".results").html("<h2>Sorry! Your answer is incorrect! </h2>");
+            loadnextquestion ();
+          
+        }
 
-    if (youranswer == qaobject.results[current_question].correct_answer) {
-        //alert("CORRECT");
-        correctnum++;
-        current_question++;
-        populateqa(current_question,qaobject);
-        resettimer();
     }
-    else {
-        //alert("WRONG");
-        wrongnum++
-        current_question++;
-        populateqa(current_question,qaobject);
-        resettimer();
-    }
+    
   })
 
   $(document).on("click", "#again", function(event) {
 
-    event.preventDefault();
-   
-current_question = 0;
-correctnum = 0;
-wrongnum = 0;
-
-        $.ajax({
-      url: queryURL,
-      method: "GET"
-    }).then(function(response) {
-        qaobject = response;
-
-    populateqa (current_question,response);
-    starttimer ();
-    });
+    initquestions();
 
   })
 
-var totaltime = 30;
-var interval = 1000;
+
 
 function starttimer () {
     clearInterval(intervalId);
@@ -110,20 +122,24 @@ function starttimer () {
 function decreasement () {
     if (totaltime > 0) {
       totaltime = totaltime - (interval/1000);
-
+        console.log(timesup);
       $(".counter").html("<h1>" + totaltime + "</h1>");
     }
-    else {
+    else if (totaltime == 0 || totaltime < 0) {
+        if (timesup == false) {
+        timesup = true;
         wrongnum++
         current_question++;
-        populateqa(current_question,qaobject);
-        resettimer();
+        $(".results").html("<h2>Time's up! </h2>");
+        loadnextquestion ();
+        }
+        
     }
   }
 
 function resettimer() {
-    
-    totaltime = 30;
+    timesup = false;
+    totaltime = 3;
     clearInterval(intervalId);
     starttimer ();
 
@@ -135,3 +151,14 @@ function stop() {
     clearInterval(intervalId);
   
   }
+
+  function loadnextquestion () {
+    setTimeout(function func() {
+        populateqa ();      
+      }, 3000);
+  }
+
+
+
+
+  initquestions ();
