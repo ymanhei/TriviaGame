@@ -6,7 +6,7 @@ var correctnum = 0;
 var wrongnum = 0;
 var isclicked = false;
 var timesup = false;
-var totaltime = 3;
+var totaltime = 15;
 var interval = 1000;
 
 function initquestions () {
@@ -36,7 +36,7 @@ function populateqa () {
         $(".questions").empty();
         console.log("current_question " + current_question);
        // console.log(qaobject.results);
-        $(".questions").html("Question " + current_question + ". " + qaobject.results[current_question-1].question);
+        $(".questions").html("<h1>Question " + current_question + ". " + qaobject.results[current_question-1].question) + "</h1>";
         isclicked = false;
         
 
@@ -44,7 +44,7 @@ function populateqa () {
         allanswers.push(qaobject.results[current_question-1].correct_answer);
         shuffle(allanswers);
         for (i=0; i< allanswers.length; i++ ){
-            $(".choices").append('<br><input class="btn btn-primary" type="button" value="' + allanswers[i] + '">');
+            $(".choices").append('<br><input class="btn btn-primary btn-block" type="button" value="' + allanswers[i] + '">');
         }
         resettimer();
     } 
@@ -123,8 +123,13 @@ function decreasement () {
     if (totaltime > 0) {
       totaltime = totaltime - (interval/1000);
         console.log(timesup);
-      $(".counter").html("<h1>" + totaltime + "</h1>");
+      $(".counter").html(totaltime);
+      if (totaltime < 10) {
+        $(".counter").css("color","red");
+        $(".counter").css("font-size","52px");
     }
+    }
+    
     else if (totaltime == 0 || totaltime < 0) {
         if (timesup == false) {
         timesup = true;
@@ -139,7 +144,9 @@ function decreasement () {
 
 function resettimer() {
     timesup = false;
-    totaltime = 3;
+    totaltime = 15;
+    $(".counter").css("color","green");
+    $(".counter").css("font-size","38px");
     clearInterval(intervalId);
     starttimer ();
 
