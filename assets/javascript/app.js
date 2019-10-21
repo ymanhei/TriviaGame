@@ -52,7 +52,7 @@ function populateqa () {
         $(".choices").empty();
         $(".questions").empty();
         $(".results").empty();
-        $(".questions").html("You have " + correctnum +" correct answer and " + wrongnum + " incorrect answer.");
+        $(".questions").html("<h1>You have " + correctnum +" correct answers and " + wrongnum + " wrong answers.</h1>");
         $(".choices").html('<input class="btn-success" type="button" id="again" value="Try Again?">');
         stop();
     }
@@ -97,7 +97,8 @@ function shuffle(array) {
             wrongnum++
             current_question++;
             //console.log(current_question);
-            $(".results").html("<h2>Sorry! Your answer is incorrect! </h2>");
+            $(".results").html("<h2>Sorry! Your answer is wrong! The correct answer is <span id='correct_answer'>" + qaobject.results[current_question-2].correct_answer + "</span></h2>");
+            //$("[value=" + correct_answer + "]").css("background","background: rgba(0,255,0,0.1);");
             loadnextquestion ();
           
         }
@@ -135,7 +136,7 @@ function decreasement () {
         timesup = true;
         wrongnum++
         current_question++;
-        $(".results").html("<h2>Time's up! </h2>");
+        $(".results").html("<h2>Time's up! The correct answer is <span id='correct_answer'>" + qaobject.results[current_question-2].correct_answer + "</span> </h2>");
         loadnextquestion ();
         }
         

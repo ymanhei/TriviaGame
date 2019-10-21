@@ -42,3 +42,8 @@
    .results {
        color:white;
    }
+
+   #correct_answer {
+       font-size: 48px;
+       color:green;
+   }
